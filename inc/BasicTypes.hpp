@@ -1,8 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <algorithm>
-
 
 using BYTE = unsigned char;
 /* To simplify the coding, the payload is holds in vector. This will increase unnecessary temporary objects */
@@ -24,29 +22,14 @@ enum class InterfaceType
 class PDU
 {
 public:
-    PDU(ProtocolType type, const Payload &payload) : data(payload.size() + 1)
-    {
-        data[0] = static_cast<BYTE>(type);
-        std::copy(payload.begin(), payload.end(), ++data.begin());
-    }
+    PDU(ProtocolType type, const Payload &payload);
 
-    PDU(Payload payload) : data(payload.size())
-    {
-        std::copy(payload.begin(), payload.end(), data.begin());
-    }
+    PDU(Payload payload);
 
     /* Create a temporary Payload object return the payload without the header.*/
-    const Payload getPayload() const
-    {
-        Payload result(data.size() - 1);
-        copy(data.begin() + 1, data.end(), result.begin());
-        return result;
-    }
+    const Payload getPayload() const;
 
-    const ProtocolType getType() const
-    {
-    	return static_cast<ProtocolType>(data[0]);
-    }
+    const ProtocolType getType() const;
 
     const Payload getFullPduData() const
     {
