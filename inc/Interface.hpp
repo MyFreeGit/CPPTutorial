@@ -31,6 +31,7 @@ public:
         return payload;
     }
 
+protected:
     void addProtocolAtBottom(Protocol *prtcl)
     {
         protocolStack.push_back(SharedPtrType(prtcl));
@@ -41,3 +42,14 @@ private:
     std::vector<SharedPtrType> protocolStack;
 };
 
+class UU_GNB_Interface : public Interface
+{
+public:
+    UU_GNB_Interface()
+    {
+        addProtocolAtBottom(new PDCP());
+        addProtocolAtBottom(new RLC());
+        addProtocolAtBottom(new MAC());
+        addProtocolAtBottom(new PHY());
+    }
+};

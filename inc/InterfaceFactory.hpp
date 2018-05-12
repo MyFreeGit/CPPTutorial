@@ -15,19 +15,9 @@ public:
         switch(type)
         {
         case InterfaceType::UU_GNB:
-            return createUU_GNB_Interface();
+            return std::shared_ptr<Interface>(new UU_GNB_Interface());
         default:
             throw std::invalid_argument("The interface not support yet!");
         }
-    }
-protected:
-    static std::shared_ptr<Interface> createUU_GNB_Interface()
-    {
-        Interface *result = new Interface();
-        result->addProtocolAtBottom(new PDCP());
-        result->addProtocolAtBottom(new RLC());
-        result->addProtocolAtBottom(new MAC());
-        result->addProtocolAtBottom(new PHY());
-        return std::make_shared<Interface>(*result);
     }
 };
