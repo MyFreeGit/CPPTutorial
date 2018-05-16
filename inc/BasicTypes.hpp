@@ -36,7 +36,7 @@ public:
         return data;
     }
 
-    const size_t getSize() const
+    const std::size_t getSize() const
     {
         return this->data.size();
     }
