@@ -63,14 +63,12 @@ TEST_F(ProtocolTest, Protocol_PHY_Empty_Userdata)
     //ce3d17f2c5614cfe
     Payload target = {static_cast<Payload::value_type>(ProtocolType::PHY)};
     target.insert(target.end(), 8, 0x0);
-    Payload empty{};
-    target.insert(target.end(), empty.begin(), empty.end());
 
     PHY phy{};
     PDU pdu = phy.encode(empty);
 
     EXPECT_EQ(target, pdu.getFullData());
     const Payload result = phy.decode(pdu);
-    EXPECT_EQ(payload, result);
+    EXPECT_EQ(empty, result);
 }
 }

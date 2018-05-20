@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <iterator>
-#include <iostream>
+#include<stdexcept>
+
 
 using BYTE = unsigned char;
 /* To simplify the coding, the payload is holds in vector. This will increase unnecessary temporary objects */
