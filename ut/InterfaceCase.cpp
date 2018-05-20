@@ -17,7 +17,7 @@ TEST_F(InterfaceTest, testUU_GNB_Interface)
     Payload target = {static_cast<BYTE>(ProtocolType::PHY), static_cast<BYTE>(ProtocolType::MAC),
                       static_cast<BYTE>(ProtocolType::RLC), static_cast<BYTE>(ProtocolType::PDCP)};
     target.insert(target.end(), payload.begin(), payload.end());
-    EXPECT_EQ(target, pdu.getFullPduData());
+    EXPECT_EQ(target, pdu.getFullData());
 
     Payload result = interface->receiveData(pdu);
     EXPECT_EQ(payload, result);

@@ -2,22 +2,23 @@
 
 #include <algorithm>
 
-PDU::PDU(ProtocolType type, const Payload &payload) : data(payload.size() + 1)
+PDU::PDU(ProtocolType type, const Payload &payload) : data()
 {
-    data[0] = static_cast<BYTE>(type);
-    std::copy(payload.begin(), payload.end(), ++data.begin());
+    *this << type;
+    *this << payload;
+    rewind();
 }
 
-PDU::PDU(Payload payload) : data(payload.size())
+PDU::PDU(Payload payload) : data()
 {
-    std::copy(payload.begin(), payload.end(), data.begin());
+    *this << payload;
+    rewind();
 }
 
-const Payload PDU::getPayload() const
+PDU::PDU(ProtocolType type) : data()
 {
-    Payload result(data.size() - 1);
-    copy(data.begin() + 1, data.end(), result.begin());
-    return result;
+    *this << type;
+    rewind();
 }
 
 const ProtocolType PDU::getType() const

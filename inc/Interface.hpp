@@ -15,7 +15,7 @@ public:
         PDU pdu = (*iter)->encode(payload);
         while(++iter != protocolStack.cend())
         {
-            pdu = (*iter)->encode(pdu.getFullPduData());
+            pdu = (*iter)->encode(pdu.getFullData());
         }
         return pdu;
     }
@@ -26,7 +26,8 @@ public:
         Payload payload = (*rit)->decode(pdu);
         while(++rit != protocolStack.crend())
         {
-            payload = (*rit)->decode(PDU(payload));
+            PDU pdu{payload};
+            payload = (*rit)->decode(pdu);
         }
         return payload;
     }

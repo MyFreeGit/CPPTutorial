@@ -5,18 +5,10 @@
 class Protocol
 {
 public:
-    virtual PDU encode(const Payload &payload) const
-    {
-        PDU pdu{getType(), payload};
-        return pdu;
-    }
+    virtual PDU encode(const Payload &payload) const;
 
-    virtual const Payload decode(const PDU &pdu) const
-    {
-        if (pdu.getType() != getType())
-            throw std::invalid_argument("The header is miss match.");
-        return pdu.getPayload();
-    }
+    virtual const Payload decode(PDU &pdu) const;
+
     virtual ProtocolType getType() const = 0;
     virtual ~Protocol() = default;
 };
@@ -24,15 +16,20 @@ public:
 class PHY : public Protocol
 {
 public:
+    virtual PDU encode(const Payload &payload) const;
+
+    virtual const Payload decode(PDU &pdu) const;
+
     virtual ProtocolType getType() const
     {
         return ProtocolType::PHY;
     }
+private:
+    static const int HASH_KEY_SIZE = sizeof(std::size_t) / sizeof(BYTE);
 };
 
 class MAC : public Protocol
 {
-public:
     virtual ProtocolType getType() const
     {
         return ProtocolType::MAC;
