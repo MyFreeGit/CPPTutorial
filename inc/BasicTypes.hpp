@@ -1,8 +1,10 @@
 #pragma once
 
 #include <vector>
-#include<stdexcept>
-
+#include <stdexcept>
+#include <map>
+#include <string>
+#include <memory>
 
 using BYTE = unsigned char;
 /* To simplify the coding, the payload is holds in vector. This will increase unnecessary temporary objects */
@@ -11,9 +13,38 @@ using Payload = std::vector<BYTE>;
 /* To make the excise easy, each protocol header is only one byte, the value is indicate which protocol is*/
 enum class ProtocolType : BYTE
 {
-    PHY = 1, MAC = 2, RLC = 3, PDCP = 4
+    PHY = 1, MAC = 2, RLC = 3, PDCP = 4, PHY_WITH_HASH = 128
 };
 
+class ProtocolNameChecker
+{
+public:
+    using PointerType = std::shared_ptr<const ProtocolNameChecker>;
+    static auto getChecker()
+    {
+        if(not instance){
+            instance = PointerType(new ProtocolNameChecker());
+        }
+        return instance;
+    }
+    std::string find(ProtocolType type) const
+    {
+        return lookupTable.at(type);
+    }
+
+private:
+    static PointerType instance;
+
+    ProtocolNameChecker()
+    {
+        lookupTable[ProtocolType::PHY] = "PHY";
+        lookupTable[ProtocolType::MAC] = "MAC";
+        lookupTable[ProtocolType::RLC] = "RLC";
+        lookupTable[ProtocolType::PDCP] = "PDCP";
+        lookupTable[ProtocolType::PHY_WITH_HASH] = "PHY_WITH_HASH";
+    }
+    std::map<ProtocolType, std::string> lookupTable;
+};
 /* Interface type is named base <Interface name>_<NE name> */
 enum class InterfaceType
 {
@@ -50,6 +81,12 @@ public:
         return *this;
     }
 
+    PDU& operator << (BYTE val)
+    {
+        data.push_back(val);
+        return *this;
+    }
+
     PDU& operator << (std::size_t value)
     {
         BYTE *p = (BYTE*)&value;
@@ -63,12 +100,19 @@ public:
         return *this;
     }
 
-    void operator >> (ProtocolType &target)
+    PDU& operator >> (ProtocolType &target)
     {
         target = static_cast<ProtocolType>(data[readPos++]);
+        return *this;
     }
 
-    void operator >> (std::size_t &target)
+    PDU& operator >> (BYTE &target)
+    {
+        target = data[readPos++];
+        return *this;
+    }
+
+    PDU& operator >> (std::size_t &target)
     {
         if(data.size() - readPos < SIZE_T_SIZE)
             throw std::invalid_argument("No enough data left for std::size_t value.");
@@ -77,12 +121,14 @@ public:
         {
             target |= (static_cast<std::size_t>(data[readPos++]) << (i * 8));
         }
+        return *this;
     }
 
-    void operator >> (Payload &target)
+    PDU& operator >> (Payload &target)
     {
         target.insert(target.end(), data.begin() + readPos, data.end());
         readPos = data.size();
+        return *this;
     }
 
     const std::size_t getSize() const

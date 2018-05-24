@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+ProtocolNameChecker::PointerType ProtocolNameChecker::instance;
+
 PDU::PDU(ProtocolType type, const Payload &payload) : data()
 {
     *this << type;

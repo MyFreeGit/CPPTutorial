@@ -7,30 +7,29 @@ class Protocol
 public:
     virtual PDU encode(const Payload &payload) const;
 
-    virtual const Payload decode(PDU &pdu) const;
+    virtual const Payload decode(const PDU &pdu) const;
 
     virtual ProtocolType getType() const = 0;
     virtual ~Protocol() = default;
+protected:
+    void checkType(ProtocolType pduType) const;
 };
 
 class PHY : public Protocol
 {
-public:
-    virtual PDU encode(const Payload &payload) const;
+    virtual PDU encode(const Payload &payload) const override;
 
-    virtual const Payload decode(PDU &pdu) const;
+    virtual const Payload decode(const PDU &pdu) const override;
 
-    virtual ProtocolType getType() const
+    virtual ProtocolType getType() const override
     {
         return ProtocolType::PHY;
     }
-private:
-    static const int HASH_KEY_SIZE = sizeof(std::size_t) / sizeof(BYTE);
 };
 
 class MAC : public Protocol
 {
-    virtual ProtocolType getType() const
+    virtual ProtocolType getType() const override
     {
         return ProtocolType::MAC;
     }
@@ -39,7 +38,7 @@ class MAC : public Protocol
 class RLC : public Protocol
 {
 public:
-    virtual ProtocolType getType() const
+    virtual ProtocolType getType() const override
     {
         return ProtocolType::RLC;
     }
@@ -48,8 +47,23 @@ public:
 class PDCP : public Protocol
 {
 public:
-    virtual ProtocolType getType() const
+    virtual ProtocolType getType() const override
     {
         return ProtocolType::PDCP;
     }
+};
+
+class PHYWithHash : public Protocol
+{
+public:
+    virtual PDU encode(const Payload &payload) const override;
+
+    virtual const Payload decode(const PDU &pdu) const override;
+
+    virtual ProtocolType getType() const override
+    {
+        return ProtocolType::PHY;
+    }
+private:
+    static const int HASH_KEY_SIZE = sizeof(std::size_t) / sizeof(BYTE);
 };

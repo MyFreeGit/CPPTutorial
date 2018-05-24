@@ -50,7 +50,7 @@ TEST_F(ProtocolTest, Protocol_PHY)
     Payload target = {static_cast<Payload::value_type>(ProtocolType::PHY)};
     target.insert(target.end(), hashPart.begin(), hashPart.end());
     target.insert(target.end(), payload.begin(), payload.end());
-    PHY phy{};
+    PHYWithHash phy{};
     PDU pdu = phy.encode(payload);
 
     EXPECT_EQ(target, pdu.getFullData());
@@ -64,7 +64,7 @@ TEST_F(ProtocolTest, Protocol_PHY_Empty_Userdata)
     Payload target = {static_cast<Payload::value_type>(ProtocolType::PHY)};
     target.insert(target.end(), 8, 0x0);
 
-    PHY phy{};
+    PHYWithHash phy{};
     PDU pdu = phy.encode(empty);
 
     EXPECT_EQ(target, pdu.getFullData());
