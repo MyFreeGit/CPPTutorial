@@ -46,13 +46,13 @@ public:
     }
 
 protected:
-    void addProtocolAtBottom(Protocol *prtcl)
+    using SharedPtrType = std::shared_ptr<Protocol>;
+    void addProtocolAtBottom(SharedPtrType ptr)
     {
-        protocolStack.push_back(SharedPtrType(prtcl));
+        protocolStack.push_back(ptr);
     }
 
 private:
-    using SharedPtrType = std::shared_ptr<Protocol>;
     std::vector<SharedPtrType> protocolStack;
 };
 
@@ -64,9 +64,9 @@ class UUInterface : public Interface
 public:
     UUInterface()
     {
-        addProtocolAtBottom(new PDCP());
-        addProtocolAtBottom(new RLC());
-        addProtocolAtBottom(new MAC());
-        addProtocolAtBottom(new PHY());
+        addProtocolAtBottom(std::make_shared<PDCP>());
+        addProtocolAtBottom(std::make_shared<RLC>());
+        addProtocolAtBottom(std::make_shared<MAC>());
+        addProtocolAtBottom(std::make_shared<PHY>());
     }
 };
