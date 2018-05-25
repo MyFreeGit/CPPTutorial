@@ -9,7 +9,12 @@ public:
 
     virtual const Payload decode(const PDU &pdu) const;
 
+    /* Why we don't use data member to define the Protocol Type? The reason is if we use data member to record type
+     * that may cause the problem that the class type may mismatch with coding mistake (by assigned wrong value to it).
+     * Using static member may have problem when writing sub-class, forget to add this value.
+     * Using pure virtual function force the sub class to implement it. */
     virtual ProtocolType getType() const = 0;
+
     virtual ~Protocol() = default;
 protected:
     void checkType(ProtocolType pduType) const;

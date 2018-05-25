@@ -3,16 +3,24 @@
 #include <memory>
 #include "Protocol.hpp"
 
-/* Interface is */
+/**
+ * Network Element communicate with each other through different Interface according to the 3GPP protocol.
+ * The interface consists of a branch of protocol to build protocol stack. When sending data to peer, the
+ * data is encoded through the protocol stack from top to bottom. When receiving a frame from the peer,
+ * the frame is decoded through the protocol stack from bottom to top.*/
 class Interface
 {
 public:
-    /* Return a PDU only for easy to write UT case. To simplify the code there
-     * is no error checking */
-    PDU sendData(const Payload &payload)
+    /**
+     * Encode the user data through the protocol from top to bottom. Each protocol layer add its header
+     * to the userData and pass the result data frame as user data to the lower layer.
+     * @param userData    The user data that being sent to peer.
+     * @return    The PDU that contains each protocol's header and user data which is read to be sent to
+     *            peer.*/
+    PDU sendData(const Payload &userData) const
     {
         auto iter = protocolStack.cbegin();
-        PDU pdu = (*iter)->encode(payload);
+        PDU pdu = (*iter)->encode(userData);
         while(++iter != protocolStack.cend())
         {
             pdu = (*iter)->encode(pdu.getFullData());
@@ -20,7 +28,12 @@ public:
         return pdu;
     }
 
-    Payload receiveData(PDU pdu)
+    /**
+     * Decode the data that received from peer. Each protocol layer strip its header from pdu and pass the
+     * sdu to its upper layer as input.
+     * @param pdu    The PDU that received from peer.
+     * @return    The user data that peer send. */
+    Payload receiveData(PDU pdu) const
     {
         auto rit = protocolStack.crbegin();
         Payload payload = (*rit)->decode(pdu);
@@ -43,10 +56,13 @@ private:
     std::vector<SharedPtrType> protocolStack;
 };
 
-class UU_GNB_Interface : public Interface
+/**
+ * The UUInterface simulates the interface between UE and gNB. it contains the protocol stack which
+ * consists of PDCP, RLC, MAC, PHY from top to the bottom.*/
+class UUInterface : public Interface
 {
 public:
-    UU_GNB_Interface()
+    UUInterface()
     {
         addProtocolAtBottom(new PDCP());
         addProtocolAtBottom(new RLC());

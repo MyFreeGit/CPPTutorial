@@ -15,7 +15,7 @@ public:
         switch(type)
         {
         case InterfaceType::UU_GNB:
-            return std::shared_ptr<Interface>(new UU_GNB_Interface());
+            return std::shared_ptr<Interface>(new UUInterface());
         default:
             throw std::invalid_argument("The interface not support yet!");
         }
