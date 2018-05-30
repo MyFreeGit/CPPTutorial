@@ -21,12 +21,10 @@ PDU Protocol::encode(const Payload &payload) const
 
 const Payload Protocol::decode(const PDU &pdu) const
 {
-    // Remove the const from pdu to call the >> operator
-    PDU *pPDU = const_cast<PDU*>(&pdu);
     ProtocolType pduType;
     Payload userData;
-    (*pPDU) >> pduType >> userData;
-    pPDU->rewind(); // Call the rewind function to restore the PDU state.
+    pdu >> pduType >> userData;
+    pdu.rewind(); // Call the rewind function to restore the PDU state.
     checkType(pduType);
     return userData;
 }
@@ -40,13 +38,11 @@ PDU PHY::encode(const Payload &payload) const
 
 const Payload PHY::decode(const PDU &pdu) const
 {
-    // Remove the const from pdu to call the >> operator
-    PDU *pPDU = const_cast<PDU*>(&pdu);
     ProtocolType pduType;
     BYTE length;
     Payload userData;
-    (*pPDU) >> pduType >> length >> userData;
-    pPDU->rewind(); // Call the rewind function to restore the PDU state.
+    pdu >> pduType >> length >> userData;
+    pdu.rewind(); // Call the rewind function to restore the PDU state.
     checkType(pduType);
     if(length != userData.size())
         throw std::invalid_argument("The payload size isn't correct!");
@@ -64,13 +60,11 @@ PDU PHYWithHash::encode(const Payload &payload) const
 
 const Payload PHYWithHash::decode(const PDU &pdu) const
 {
-    PDU *pPDU = const_cast<PDU*>(&pdu);
-
     ProtocolType pduType;
     Payload userData;
     std::size_t targetHash;
-    (*pPDU) >> pduType >> targetHash >> userData;
-    pPDU->rewind();
+    pdu >> pduType >> targetHash >> userData;
+    pdu.rewind();
 
     if (pduType!= getType())
         throw std::invalid_argument("The header shall be PHY.");

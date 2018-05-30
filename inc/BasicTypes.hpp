@@ -70,7 +70,7 @@ public:
         return data;
     }
 
-    void rewind()
+    void rewind() const
     {
         readPos = 0;
     }
@@ -100,19 +100,19 @@ public:
         return *this;
     }
 
-    PDU& operator >> (ProtocolType &target)
+    const PDU& operator >> (ProtocolType &target) const
     {
         target = static_cast<ProtocolType>(data[readPos++]);
         return *this;
     }
 
-    PDU& operator >> (BYTE &target)
+    const PDU& operator >> (BYTE &target) const
     {
         target = data[readPos++];
         return *this;
     }
 
-    PDU& operator >> (std::size_t &target)
+    const PDU& operator >> (std::size_t &target) const
     {
         if(data.size() - readPos < SIZE_T_SIZE)
             throw std::invalid_argument("No enough data left for std::size_t value.");
@@ -124,7 +124,7 @@ public:
         return *this;
     }
 
-    PDU& operator >> (Payload &target)
+    const PDU& operator >> (Payload &target) const
     {
         target.insert(target.end(), data.begin() + readPos, data.end());
         readPos = data.size();
@@ -142,7 +142,9 @@ private:
 
     /* Couldn't use iterator type to records the read position, due to the data maybe re-allocated,
      * when the vector's size is growing*/
-    int readPos;
+    /* Use mutable qualifier to make those function which modify the readPos const. That may cause
+     * the PDU class not thread safe, but in this context the PDU object isn't shared by multi-threads.*/
+    mutable int readPos;
 
     Payload data;
 };
