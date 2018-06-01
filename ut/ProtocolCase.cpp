@@ -29,46 +29,33 @@ protected:
 
 TEST_F(ProtocolTest, Protocol_PDCP)
 {
-    testCommonProtocol(PDCP(), ProtocolType::PDCP, payload);
-    testCommonProtocol(PDCP(), ProtocolType::PDCP, empty);
+    testCommonProtocol(ConcreteProtocol<ProtocolType::PDCP>(), ProtocolType::PDCP, payload);
+    testCommonProtocol(ConcreteProtocol<ProtocolType::PDCP>(), ProtocolType::PDCP, empty);
 }
 
 TEST_F(ProtocolTest, Protocol_RLC)
 {
-    testCommonProtocol(RLC(), ProtocolType::RLC, payload);
-    testCommonProtocol(RLC(), ProtocolType::RLC, empty);
+    testCommonProtocol(ConcreteProtocol<ProtocolType::RLC>(), ProtocolType::RLC, payload);
+    testCommonProtocol(ConcreteProtocol<ProtocolType::RLC>(), ProtocolType::RLC, empty);
 }
 
 TEST_F(ProtocolTest, Protocol_MAC)
 {
-    testCommonProtocol(MAC(), ProtocolType::MAC, payload);
-    testCommonProtocol(MAC(), ProtocolType::MAC, empty);
+    testCommonProtocol(ConcreteProtocol<ProtocolType::MAC>(), ProtocolType::MAC, payload);
+    testCommonProtocol(ConcreteProtocol<ProtocolType::MAC>(), ProtocolType::MAC, empty);
 }
 
 TEST_F(ProtocolTest, Protocol_PHY)
 {
-    Payload target = {static_cast<Payload::value_type>(ProtocolType::PHY)};
-    target.insert(target.end(), hashPart.begin(), hashPart.end());
-    target.insert(target.end(), payload.begin(), payload.end());
-    PHYWithHash phy{};
+    ConcreteProtocol<ProtocolType::PHY> phy;
     PDU pdu = phy.encode(payload);
+    EXPECT_EQ(ProtocolType::PHY, pdu.getType());
 
+    Payload target = {static_cast<Payload::value_type>(ProtocolType::PHY), static_cast<BYTE>(payload.size())};
+    target.insert(target.end(), payload.begin(), payload.end());
     EXPECT_EQ(target, pdu.getFullData());
+
     const Payload result = phy.decode(pdu);
     EXPECT_EQ(payload, result);
-}
-
-TEST_F(ProtocolTest, Protocol_PHY_Empty_Userdata)
-{
-    //ce3d17f2c5614cfe
-    Payload target = {static_cast<Payload::value_type>(ProtocolType::PHY)};
-    target.insert(target.end(), 8, 0x0);
-
-    PHYWithHash phy{};
-    PDU pdu = phy.encode(empty);
-
-    EXPECT_EQ(target, pdu.getFullData());
-    const Payload result = phy.decode(pdu);
-    EXPECT_EQ(empty, result);
 }
 }

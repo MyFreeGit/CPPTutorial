@@ -64,9 +64,9 @@ class UUInterface : public Interface
 public:
     UUInterface()
     {
-        addProtocolAtBottom(std::make_shared<PDCP>());
-        addProtocolAtBottom(std::make_shared<RLC>());
-        addProtocolAtBottom(std::make_shared<MAC>());
-        addProtocolAtBottom(std::make_shared<PHY>());
+        addProtocolAtBottom(std::make_shared<ConcreteProtocol<ProtocolType::PDCP>>());
+        addProtocolAtBottom(std::make_shared<ConcreteProtocol<ProtocolType::RLC>>());
+        addProtocolAtBottom(std::make_shared<ConcreteProtocol<ProtocolType::MAC>>());
+        addProtocolAtBottom(std::make_shared<ConcreteProtocol<ProtocolType::PHY>>());
     }
 };
