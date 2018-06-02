@@ -1,79 +1,93 @@
 #pragma once
 #include <stdexcept>
+#include <functional>
 #include "BasicTypes.hpp"
 
 class Protocol
 {
 public:
-    virtual PDU encode(const Payload &payload) const
+    virtual PDU encode(const Payload &payload) const = 0;
+
+    virtual const Payload decode(const PDU &pdu) const = 0;
+
+    virtual ~Protocol() = default;
+};
+
+struct NormalEncoder
+{
+    static PDU encode(ProtocolType type, const Payload &payload)
     {
-        PDU pdu{getType(), payload};
+        PDU pdu { type, payload };
         return pdu;
     }
+};
 
-    virtual const Payload decode(const PDU &pdu) const
+struct NormalDecoder
+{
+    static const Payload decode(ProtocolType type, const PDU &pdu)
     {
         ProtocolType pduType;
         Payload userData;
         pdu >> pduType >> userData;
         pdu.rewind(); // Call the rewind function to restore the PDU state.
-        checkType(pduType);
         return userData;
-    }
-
-    virtual ProtocolType getType() const = 0;
-
-    virtual ~Protocol() = default;
-protected:
-    void checkType(ProtocolType pduType) const
-    {
-        if (pduType!= getType())
-        {
-            auto expect = ProtocolNameChecker::getChecker()->find(pduType);
-            auto get = ProtocolNameChecker::getChecker()->find(getType());
-            throw std::invalid_argument("The header shall be " + expect + ", but get " + get + "!");
-         }
     }
 };
 
-/* Using the ProtocolType value as template parameter. */
-template <ProtocolType type>
+template < ProtocolType type,
+          typename Encoder = NormalEncoder,
+          typename Decoder = NormalDecoder>
 class ConcreteProtocol : public Protocol
 {
 public:
-    virtual ProtocolType getType() const final
+    PDU encode(const Payload &payload) const final
     {
-        return type;
+        return Encoder::encode(type, payload);
     }
 
-};
-template <>
-class ConcreteProtocol <ProtocolType::PHY> : public Protocol
-{
-public:
-    virtual PDU encode(const Payload &payload) const
+    const Payload decode(const PDU &pdu) const final
     {
-        PDU pdu{getType()};
+        return Decoder::decode(type, pdu);
+    }
+};
+
+struct DataCountingEncoder
+{
+    static PDU encode(ProtocolType type, const Payload &payload)
+    {
+        PDU pdu{type};
         pdu << static_cast<BYTE>(payload.size()) << payload;
         return pdu;
     }
+};
 
-    virtual const Payload decode(const PDU &pdu) const
+struct DataCountingDecoder
+{
+    static const Payload decode(ProtocolType type, const PDU &pdu)
     {
         ProtocolType pduType;
         BYTE length;
         Payload userData;
         pdu >> pduType >> length >> userData;
         pdu.rewind(); // Call the rewind function to restore the PDU state.
-        checkType(pduType);
         if(length != userData.size())
             throw std::invalid_argument("The payload size isn't correct!");
         return userData;
     }
-
-    virtual ProtocolType getType() const
-    {
-        return ProtocolType::PHY;
-    }
 };
 
+template <>
+class ConcreteProtocol<ProtocolType::PHY>: public Protocol
+{
+public:
+    PDU encode(const Payload &payload) const final
+    {
+        return DataCountingEncoder::encode(ProtocolType::PHY, payload);
+    }
+
+    const Payload decode(const PDU &pdu) const final
+    {
+        return DataCountingDecoder::decode(ProtocolType::PHY, pdu);
+    }
+
+};

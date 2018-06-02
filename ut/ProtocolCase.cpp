@@ -45,6 +45,7 @@ TEST_F(ProtocolTest, Protocol_MAC)
     testCommonProtocol(ConcreteProtocol<ProtocolType::MAC>(), ProtocolType::MAC, empty);
 }
 
+
 TEST_F(ProtocolTest, Protocol_PHY)
 {
     ConcreteProtocol<ProtocolType::PHY> phy;
