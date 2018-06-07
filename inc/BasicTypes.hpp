@@ -34,17 +34,11 @@ public:
 
 private:
     static PointerType instance;
-
-    ProtocolNameChecker()
-    {
-        lookupTable[ProtocolType::PHY] = "PHY";
-        lookupTable[ProtocolType::MAC] = "MAC";
-        lookupTable[ProtocolType::RLC] = "RLC";
-        lookupTable[ProtocolType::PDCP] = "PDCP";
-        lookupTable[ProtocolType::PHY_WITH_HASH] = "PHY_WITH_HASH";
-    }
-    std::map<ProtocolType, std::string> lookupTable;
+    ProtocolNameChecker() {};
+    using LookupTable = std::map<ProtocolType, std::string>;
+    static const LookupTable lookupTable;
 };
+
 /* Interface type is named base <Interface name>_<NE name> */
 enum class InterfaceType
 {

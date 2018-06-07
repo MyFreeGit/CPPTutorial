@@ -11,6 +11,11 @@
 class Interface
 {
 public:
+    using SharedPtrType = std::shared_ptr<Protocol>;
+    Interface(std::initializer_list<SharedPtrType> list)
+    {
+        protocolStack = std::move(list);
+    }
     /**
      * Encode the user data through the protocol from top to bottom. Each protocol layer add its header
      * to the userData and pass the result data frame as user data to the lower layer.
@@ -45,13 +50,6 @@ public:
         return payload;
     }
 
-protected:
-    using SharedPtrType = std::shared_ptr<Protocol>;
-    void addProtocolAtBottom(SharedPtrType ptr)
-    {
-        protocolStack.push_back(ptr);
-    }
-
 private:
     std::vector<SharedPtrType> protocolStack;
 };
@@ -62,11 +60,8 @@ private:
 class UUInterface : public Interface
 {
 public:
-    UUInterface()
+    UUInterface() : Interface{std::make_shared<PDCP>(), std::make_shared<RLC>(),
+                              std::make_shared<MAC>(), std::make_shared<PHY>()}
     {
-        addProtocolAtBottom(std::make_shared<PDCP>());
-        addProtocolAtBottom(std::make_shared<RLC>());
-        addProtocolAtBottom(std::make_shared<MAC>());
-        addProtocolAtBottom(std::make_shared<PHY>());
     }
 };

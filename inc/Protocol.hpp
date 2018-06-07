@@ -22,6 +22,7 @@ protected:
 
 class PHY : public Protocol
 {
+public:
     virtual PDU encode(const Payload &payload) const override;
 
     virtual const Payload decode(const PDU &pdu) const override;
@@ -34,6 +35,7 @@ class PHY : public Protocol
 
 class MAC : public Protocol
 {
+public:
     virtual ProtocolType getType() const override
     {
         return ProtocolType::MAC;
@@ -67,7 +69,7 @@ public:
 
     virtual ProtocolType getType() const override
     {
-        return ProtocolType::PHY;
+        return ProtocolType::PHY_WITH_HASH;
     }
 private:
     static const int HASH_KEY_SIZE = sizeof(std::size_t) / sizeof(BYTE);

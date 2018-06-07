@@ -3,6 +3,12 @@
 #include <algorithm>
 
 ProtocolNameChecker::PointerType ProtocolNameChecker::instance;
+const ProtocolNameChecker::LookupTable ProtocolNameChecker::lookupTable {
+        {ProtocolType::PHY, "PHY"},
+        {ProtocolType::MAC, "MAC"},
+        {ProtocolType::RLC, "RLC"},
+        {ProtocolType::PDCP, "PDCP"}
+};
 
 PDU::PDU(ProtocolType type, const Payload &payload) : data()
 {

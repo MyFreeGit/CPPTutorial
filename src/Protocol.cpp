@@ -7,8 +7,8 @@ void Protocol::checkType(ProtocolType pduType) const
 {
     if (pduType!= getType())
     {
-        auto expect = ProtocolNameChecker::getChecker()->find(pduType);
-        auto get = ProtocolNameChecker::getChecker()->find(getType());
+        auto expect = ProtocolNameChecker::getChecker()->find(getType());
+        auto get = ProtocolNameChecker::getChecker()->find(pduType);
         throw std::invalid_argument("The header shall be " + expect + ", but get " + get + "!");
      }
 }
